@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(cd /home/walid/Documents/random_coding_proj/compas_dans_loeil/nouvelle\\\\ version/version_react && npm create vite@latest . -- --template react-ts --yes:*)",
+      "Bash(cd:*)",
+      "Bash(cd /home/walid/Documents/random_coding_proj/compas_dans_loeil/nouvelle\\\\ version/version_react && npx tsc:*)",
+      "Bash(npm install vite-plugin-pwa -D)",
+      "Bash(npm run dev -- --host)"
+    ]
+  }
+}
