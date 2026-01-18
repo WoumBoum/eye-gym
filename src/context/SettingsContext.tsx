@@ -64,22 +64,31 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const exploration = currentProfile?.exploration || createDefaultExploration();
 
   // Save profile when it changes
-  const updateCurrentProfile = useCallback((updates: Partial<Profile>) => {
-    if (!currentProfile) return;
-
-    const updatedProfile: Profile = {
-      ...currentProfile,
-      ...updates,
-      lastPlayedAt: Date.now(),
-    };
+  // Accepts either a partial profile or a function that receives the current profile and returns updates
+  const updateCurrentProfile = useCallback((
+    updates: Partial<Profile> | ((current: Profile) => Partial<Profile>)
+  ) => {
+    if (!currentProfileId) return;
 
     setProfiles(prev => {
-      const newProfiles = prev.map(p => p.id === currentProfile.id ? updatedProfile : p);
+      const profile = prev.find(p => p.id === currentProfileId);
+      if (!profile) return prev;
+
+      // Resolve updates: either use directly or call with current profile
+      const actualUpdates = typeof updates === 'function' ? updates(profile) : updates;
+
+      const updatedProfile: Profile = {
+        ...profile,
+        ...actualUpdates,
+        lastPlayedAt: Date.now(),
+      };
+
+      const newProfiles = prev.map(p => p.id === currentProfileId ? updatedProfile : p);
       // Save to localStorage
       saveProfile(updatedProfile);
       return newProfiles;
     });
-  }, [currentProfile]);
+  }, [currentProfileId]);
 
   // Profile management
   const createNewProfile = useCallback((name: string): Profile => {
@@ -127,11 +136,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   // Settings management
   const updateSettings = useCallback((newSettings: Partial<Settings>) => {
-    if (!currentProfile) return;
-    updateCurrentProfile({
-      settings: { ...currentProfile.settings, ...newSettings },
-    });
-  }, [currentProfile, updateCurrentProfile]);
+    updateCurrentProfile(current => ({
+      settings: { ...current.settings, ...newSettings },
+    }));
+  }, [updateCurrentProfile]);
 
   const resetSettings = useCallback(() => {
     updateCurrentProfile({ settings: DEFAULT_SETTINGS });
@@ -147,51 +155,50 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   // History management
   const addExercise = useCallback((exercise: Exercise) => {
-    if (!currentProfile) return;
-    updateCurrentProfile({
-      history: [...currentProfile.history, exercise],
-    });
-  }, [currentProfile, updateCurrentProfile]);
+    updateCurrentProfile(current => ({
+      history: [...current.history, exercise],
+    }));
+  }, [updateCurrentProfile]);
 
   const updateGradientsFromExercise = useCallback((
     exercise: Exercise,
     canvasWidth: number,
     canvasHeight: number
   ) => {
-    if (!currentProfile) return;
-
     const normalizedX = exercise.idealGreen.x / canvasWidth;
     const normalizedY = exercise.idealGreen.y / canvasHeight;
 
-    const newF1 = updateF1(
-      currentProfile.gradients.f1,
-      normalizedX,
-      normalizedY,
-      exercise.score,
-      currentProfile.settings.sigma1,
-      currentProfile.settings.learningRate
-    );
+    updateCurrentProfile(current => {
+      const newF1 = updateF1(
+        current.gradients.f1,
+        normalizedX,
+        normalizedY,
+        exercise.score,
+        current.settings.sigma1,
+        current.settings.learningRate
+      );
 
-    const newF2 = updateF2(
-      currentProfile.gradients.f2,
-      exercise.ratio,
-      exercise.score,
-      currentProfile.settings.sigma2,
-      currentProfile.settings.learningRate
-    );
+      const newF2 = updateF2(
+        current.gradients.f2,
+        exercise.ratio,
+        exercise.score,
+        current.settings.sigma2,
+        current.settings.learningRate
+      );
 
-    const newF3 = updateF3(
-      currentProfile.gradients.f3,
-      exercise.angle,
-      exercise.score,
-      currentProfile.settings.sigma3,
-      currentProfile.settings.learningRate
-    );
+      const newF3 = updateF3(
+        current.gradients.f3,
+        exercise.angle,
+        exercise.score,
+        current.settings.sigma3,
+        current.settings.learningRate
+      );
 
-    updateCurrentProfile({
-      gradients: { f1: newF1, f2: newF2, f3: newF3 },
+      return {
+        gradients: { f1: newF1, f2: newF2, f3: newF3 },
+      };
     });
-  }, [currentProfile, updateCurrentProfile]);
+  }, [updateCurrentProfile]);
 
   const clearExerciseHistory = useCallback(() => {
     updateCurrentProfile({
@@ -208,37 +215,37 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     ratioBucket: number,
     angleBucket: number
   ) => {
-    if (!currentProfile) return;
+    updateCurrentProfile(current => {
+      const newExploration = { ...current.exploration };
 
-    const newExploration = { ...currentProfile.exploration };
+      // Mark position as tested
+      if (posY >= 0 && posY < newExploration.positionGrid.length &&
+          posX >= 0 && posX < newExploration.positionGrid[0].length) {
+        newExploration.positionGrid = newExploration.positionGrid.map((row, y) =>
+          y === posY ? row.map((v, x) => x === posX ? true : v) : row
+        );
+      }
 
-    // Mark position as tested
-    if (posY >= 0 && posY < newExploration.positionGrid.length &&
-        posX >= 0 && posX < newExploration.positionGrid[0].length) {
-      newExploration.positionGrid = newExploration.positionGrid.map((row, y) =>
-        y === posY ? row.map((v, x) => x === posX ? true : v) : row
-      );
-    }
+      // Mark ratio as tested
+      if (ratioBucket >= 0 && ratioBucket < newExploration.ratioTested.length) {
+        newExploration.ratioTested = newExploration.ratioTested.map((v, i) =>
+          i === ratioBucket ? true : v
+        );
+      }
 
-    // Mark ratio as tested
-    if (ratioBucket >= 0 && ratioBucket < newExploration.ratioTested.length) {
-      newExploration.ratioTested = newExploration.ratioTested.map((v, i) =>
-        i === ratioBucket ? true : v
-      );
-    }
+      // Mark angle as tested
+      if (angleBucket >= 0 && angleBucket < newExploration.angleTested.length) {
+        newExploration.angleTested = newExploration.angleTested.map((v, i) =>
+          i === angleBucket ? true : v
+        );
+      }
 
-    // Mark angle as tested
-    if (angleBucket >= 0 && angleBucket < newExploration.angleTested.length) {
-      newExploration.angleTested = newExploration.angleTested.map((v, i) =>
-        i === angleBucket ? true : v
-      );
-    }
+      // Check if exploration is complete
+      newExploration.explorationComplete = checkExplorationComplete(newExploration);
 
-    // Check if exploration is complete
-    newExploration.explorationComplete = checkExplorationComplete(newExploration);
-
-    updateCurrentProfile({ exploration: newExploration });
-  }, [currentProfile, updateCurrentProfile]);
+      return { exploration: newExploration };
+    });
+  }, [updateCurrentProfile]);
 
   // Export/Import
   const exportCurrentProfile = useCallback((): string => {
