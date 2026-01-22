@@ -17,12 +17,13 @@ export function calculateScore(
   const userDistance = distance(userPoint, idealPoint);
   const referenceDistance = distance(darkBlue, darkRed);
 
-  // Sigma controls the spread - at distance = sigma, score ≈ 37
-  // At distance = 2*sigma, score ≈ 1.8
-  const sigma = referenceDistance * 0.4;
+  // Simple exponential decay (not Gaussian) for steeper drop near perfect
+  // Gaussian exp(-x²) is flat at origin, exponential exp(-x) drops immediately
+  // Score tends asymptotically to 1 (not 0) for better statistics visibility
+  const sigma = referenceDistance * 0.5;
 
   const normalizedDistance = userDistance / sigma;
-  const score = 100 * Math.exp(-normalizedDistance * normalizedDistance);
+  const score = 1 + 99 * Math.exp(-normalizedDistance);
 
   return {
     score: Math.round(score * 10) / 10, // Round to 1 decimal
