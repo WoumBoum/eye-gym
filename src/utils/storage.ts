@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: Settings = {
   learningRate: 0.1,
   darkMode: false,
   pointSize: 18,
+  language: 'en',
 };
 
 // Create default exploration state

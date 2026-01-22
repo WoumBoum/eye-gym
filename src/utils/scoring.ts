@@ -1,5 +1,6 @@
 import { Point } from '../types';
 import { distance } from './geometry';
+import { Translations } from '../i18n/translations';
 
 // Calculate score based on distance from ideal position
 // Uses Gaussian decay: score = 100 × exp(-(distance/σ)²)
@@ -40,11 +41,11 @@ export function getScoreColor(score: number): string {
 }
 
 // Get feedback text based on score
-export function getScoreFeedback(score: number): string {
-  if (score >= 90) return 'Excellent !';
-  if (score >= 80) return 'Très bien !';
-  if (score >= 70) return 'Bien !';
-  if (score >= 60) return 'Pas mal !';
-  if (score >= 40) return 'Peut mieux faire';
-  return 'Continuez à pratiquer';
+export function getScoreFeedback(score: number, t: Translations): string {
+  if (score >= 90) return t.excellent;
+  if (score >= 80) return t.veryGood;
+  if (score >= 70) return t.good;
+  if (score >= 60) return t.notBad;
+  if (score >= 40) return t.canDoBetter;
+  return t.keepPracticing;
 }

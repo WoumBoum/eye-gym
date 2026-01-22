@@ -31,6 +31,9 @@ export interface Exercise {
   distance: number;
 }
 
+// Language type
+export type Language = 'en' | 'fr';
+
 // Settings
 export interface Settings {
   exerciseDuration: number; // seconds (5-30)
@@ -43,6 +46,7 @@ export interface Settings {
   learningRate: number; // gradient update rate
   darkMode: boolean; // dark mode theme
   pointSize: number; // size of points in pixels (12-36)
+  language: Language; // UI language (default: English)
 }
 
 // Gradient grids

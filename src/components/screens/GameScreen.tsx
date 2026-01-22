@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { useTranslation } from '../../hooks/useTranslation';
 import { useGameTimer } from '../../hooks/useGameTimer';
 import { GameCanvas } from '../game/GameCanvas';
 import { ProgressBar } from '../game/ProgressBar';
@@ -45,6 +46,7 @@ export function GameScreen({ onBack }: GameScreenProps) {
     updateGradientsFromExercise,
     markExplorationTested,
   } = useSettings();
+  const { t } = useTranslation();
 
   const [phase, setPhase] = useState<GamePhase>('placement');
   const [exercise, setExercise] = useState<ExerciseState | null>(null);
@@ -71,7 +73,7 @@ export function GameScreen({ onBack }: GameScreenProps) {
         exercise.darkRed
       );
 
-      const feedback = getScoreFeedback(score);
+      const feedback = getScoreFeedback(score, t);
       setLastScore({ score, feedback });
       setPhase('feedback');
 
@@ -108,7 +110,7 @@ export function GameScreen({ onBack }: GameScreenProps) {
         exercise.angleBucket
       );
     },
-    [exercise, addExercise, updateGradientsFromExercise, markExplorationTested, canvasSize]
+    [exercise, addExercise, updateGradientsFromExercise, markExplorationTested, canvasSize, t]
   );
 
   // Timer callback - only called if timer is enabled
@@ -338,16 +340,16 @@ export function GameScreen({ onBack }: GameScreenProps) {
     <div className="screen game-screen">
       <div className="game-header">
         <button className="btn btn-secondary btn-back" onClick={onBack}>
-          Retour
+          {t.back}
         </button>
         <div style={{ flex: 1 }} />
         {!exploration.explorationComplete && (
           <span className="exploration-indicator">
-            Exploration: {Math.round(explorationProgress.total * 100)}%
+            {t.exploration} {Math.round(explorationProgress.total * 100)}%
           </span>
         )}
         <span style={{ fontSize: '0.9rem', color: 'var(--color-text-light)', marginLeft: '12px' }}>
-          {history.length} exercices
+          {history.length} {t.exercises}
         </span>
       </div>
 
@@ -368,7 +370,7 @@ export function GameScreen({ onBack }: GameScreenProps) {
       {phase === 'placement' && userGreen && (
         <div className="validate-button-container">
           <button className="btn btn-primary btn-validate" onClick={handleValidate}>
-            Valider <span className="shortcut-hint">(Entrée)</span>
+            {t.validate} <span className="shortcut-hint">{t.enter}</span>
           </button>
         </div>
       )}
@@ -380,7 +382,7 @@ export function GameScreen({ onBack }: GameScreenProps) {
           </div>
           <div className="score-feedback">{lastScore.feedback}</div>
           <button className="btn btn-primary btn-next" onClick={handleNext}>
-            Suivant <span className="shortcut-hint">(Entrée)</span>
+            {t.next} <span className="shortcut-hint">{t.enter}</span>
           </button>
         </div>
       )}

@@ -1,4 +1,6 @@
 import { useSettings } from '../../context/SettingsContext';
+import { useTranslation } from '../../hooks/useTranslation';
+import { Language } from '../../types';
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -17,6 +19,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     resetGradients,
     clearExerciseHistory,
   } = useSettings();
+  const { t } = useTranslation();
 
   const handleTimerEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateSettings({ timerEnabled: e.target.checked });
@@ -60,20 +63,24 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     updateSettings({ pointSize: parseInt(e.target.value, 10) });
   };
 
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateSettings({ language: e.target.value as Language });
+  };
+
   const handleResetSettings = () => {
-    if (confirm('Réinitialiser tous les paramètres aux valeurs par défaut ?')) {
+    if (confirm(t.resetSettingsConfirm)) {
       resetSettings();
     }
   };
 
   const handleResetGradients = () => {
-    if (confirm('Réinitialiser les gradients d\'apprentissage ? L\'adaptation sera perdue.')) {
+    if (confirm(t.resetGradientsConfirm)) {
       resetGradients();
     }
   };
 
   const handleClearHistory = () => {
-    if (confirm('Effacer tout l\'historique des exercices ? Cette action est irréversible.')) {
+    if (confirm(t.clearHistoryConfirm)) {
       clearExerciseHistory();
     }
   };
@@ -82,18 +89,34 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     <div className="screen">
       <div className="screen-header">
         <button className="btn btn-secondary btn-back" onClick={onBack}>
-          Retour
+          {t.back}
         </button>
-        <h1 className="screen-title">Paramètres</h1>
+        <h1 className="screen-title">{t.settingsTitle}</h1>
       </div>
 
       <div className="screen-content">
         <div className="settings-section">
-          <h2 className="settings-section-title">Apparence</h2>
+          <h2 className="settings-section-title">{t.appearance}</h2>
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Mode sombre</div>
+              <div className="setting-label">{t.language}</div>
+            </div>
+            <div className="setting-control">
+              <select
+                className="language-select"
+                value={settings.language}
+                onChange={handleLanguageChange}
+              >
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="setting-row">
+            <div>
+              <div className="setting-label">{t.darkMode}</div>
             </div>
             <div className="setting-control">
               <label className="toggle-switch">
@@ -109,8 +132,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Taille des points</div>
-              <div className="setting-value">{settings.pointSize} px</div>
+              <div className="setting-label">{t.pointSize}</div>
+              <div className="setting-value">{settings.pointSize} {t.px}</div>
             </div>
             <div className="setting-control">
               <input
@@ -127,11 +150,11 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         </div>
 
         <div className="settings-section">
-          <h2 className="settings-section-title">Jeu</h2>
+          <h2 className="settings-section-title">{t.game}</h2>
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Activer le chronomètre</div>
+              <div className="setting-label">{t.enableTimer}</div>
             </div>
             <div className="setting-control">
               <label className="toggle-switch">
@@ -148,8 +171,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           {settings.timerEnabled && (
             <div className="setting-row">
               <div>
-                <div className="setting-label">Durée par exercice</div>
-                <div className="setting-value">{settings.exerciseDuration} secondes</div>
+                <div className="setting-label">{t.exerciseDuration}</div>
+                <div className="setting-value">{settings.exerciseDuration} {t.seconds}</div>
               </div>
               <div className="setting-control">
                 <input
@@ -167,8 +190,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Delta d'angle max</div>
-              <div className="setting-value">{radToDeg(settings.maxAngleDelta)}°</div>
+              <div className="setting-label">{t.maxAngleDelta}</div>
+              <div className="setting-value">{radToDeg(settings.maxAngleDelta)}{t.degree}</div>
             </div>
             <div className="setting-control">
               <input
@@ -185,8 +208,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Marge de l'écran</div>
-              <div className="setting-value">{settings.marginPercent}%</div>
+              <div className="setting-label">{t.screenMargin}</div>
+              <div className="setting-value">{settings.marginPercent}{t.percent}</div>
             </div>
             <div className="setting-control">
               <input
@@ -203,11 +226,11 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         </div>
 
         <div className="settings-section">
-          <h2 className="settings-section-title">Apprentissage adaptatif</h2>
+          <h2 className="settings-section-title">{t.adaptiveLearning}</h2>
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Sigma Position (F1)</div>
+              <div className="setting-label">{t.sigmaPosition}</div>
               <div className="setting-value">{settings.sigma1}</div>
             </div>
             <div className="setting-control">
@@ -225,7 +248,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Sigma Ratio (F2)</div>
+              <div className="setting-label">{t.sigmaRatio}</div>
               <div className="setting-value">{settings.sigma2}</div>
             </div>
             <div className="setting-control">
@@ -243,7 +266,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Sigma Angle (F3)</div>
+              <div className="setting-label">{t.sigmaAngle}</div>
               <div className="setting-value">{settings.sigma3}</div>
             </div>
             <div className="setting-control">
@@ -261,7 +284,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
           <div className="setting-row">
             <div>
-              <div className="setting-label">Vitesse d'apprentissage</div>
+              <div className="setting-label">{t.learningRate}</div>
               <div className="setting-value">{settings.learningRate}</div>
             </div>
             <div className="setting-control">
@@ -280,13 +303,13 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
         <div className="settings-actions">
           <button className="btn btn-secondary" onClick={handleResetSettings}>
-            Réinitialiser les paramètres
+            {t.resetSettings}
           </button>
           <button className="btn btn-secondary" onClick={handleResetGradients}>
-            Réinitialiser l'apprentissage
+            {t.resetLearning}
           </button>
           <button className="btn btn-danger" onClick={handleClearHistory}>
-            Effacer l'historique
+            {t.clearHistory}
           </button>
         </div>
       </div>

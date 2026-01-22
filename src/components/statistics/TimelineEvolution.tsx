@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Exercise } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 import { HeatmapCanvas } from './HeatmapCanvas';
 import { RatioCurve } from './RatioCurve';
 import { AngleCurve } from './AngleCurve';
@@ -18,6 +19,7 @@ interface TimelineEvolutionProps {
 type ViewMode = 'heatmap' | 'ratio' | 'angle' | 'rotation';
 
 export function TimelineEvolution({ history }: TimelineEvolutionProps) {
+  const { t, language } = useTranslation();
   const [exerciseIndex, setExerciseIndex] = useState(history.length);
   const [viewMode, setViewMode] = useState<ViewMode>('heatmap');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -35,7 +37,8 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
 
   // Format date for display
   const formatDate = (timestamp: number): string => {
-    return new Date(timestamp).toLocaleDateString('fr-FR', {
+    const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+    return new Date(timestamp).toLocaleDateString(locale, {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
@@ -83,10 +86,10 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
   }, [isPlaying, history.length]);
 
   const viewButtons: { id: ViewMode; label: string }[] = [
-    { id: 'heatmap', label: 'Positions' },
-    { id: 'ratio', label: 'Ratios' },
-    { id: 'angle', label: 'Angles' },
-    { id: 'rotation', label: 'Rotation' },
+    { id: 'heatmap', label: t.positions },
+    { id: 'ratio', label: t.ratios },
+    { id: 'angle', label: t.angles },
+    { id: 'rotation', label: t.rotation },
   ];
 
   return (
@@ -94,11 +97,11 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
       <div className="timeline-header">
         <div className="timeline-info">
           <span className="timeline-count">
-            {exerciseIndex} / {history.length} exercices
+            {exerciseIndex} / {history.length} {t.exercises}
           </span>
           {currentExercise && (
             <span className="timeline-score" style={{ color: avgScore >= 70 ? '#26a269' : avgScore >= 40 ? '#e5a50a' : '#c01c28' }}>
-              Score moyen: {avgScore}
+              {t.averageScoreLabel} {avgScore}
             </span>
           )}
         </div>
@@ -112,7 +115,7 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
         <button
           className="btn-icon-timeline"
           onClick={handlePlayPause}
-          title={isPlaying ? 'Pause' : 'Lecture'}
+          title={isPlaying ? t.pause : t.playButton}
         >
           {isPlaying ? '⏸️' : '▶️'}
         </button>
@@ -133,7 +136,7 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
             setIsPlaying(false);
             setExerciseIndex(history.length);
           }}
-          title="Aller à la fin"
+          title={t.goToEnd}
         >
           ⏭️
         </button>
@@ -154,7 +157,7 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
       <div className="timeline-content">
         {exerciseIndex === 0 ? (
           <div className="timeline-empty">
-            <p>Déplacez le curseur pour voir l'évolution</p>
+            <p>{t.moveSlider}</p>
           </div>
         ) : (
           <>

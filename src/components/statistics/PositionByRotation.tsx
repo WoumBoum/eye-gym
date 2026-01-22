@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Exercise } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 import { HeatmapCanvas } from './HeatmapCanvas';
 import { generateHeatmapDataByRotation } from '../../utils/statistics';
 
@@ -9,15 +10,16 @@ interface PositionByRotationProps {
 
 // Rotation ranges in degrees
 const ROTATION_RANGES = [
-  { label: '0-30°', min: 0, max: 30 },
-  { label: '30-60°', min: 30, max: 60 },
-  { label: '60-90°', min: 60, max: 90 },
-  { label: '90-120°', min: 90, max: 120 },
-  { label: '120-150°', min: 120, max: 150 },
-  { label: '150-180°', min: 150, max: 180 },
+  { min: 0, max: 30 },
+  { min: 30, max: 60 },
+  { min: 60, max: 90 },
+  { min: 90, max: 120 },
+  { min: 120, max: 150 },
+  { min: 150, max: 180 },
 ];
 
 export function PositionByRotation({ history }: PositionByRotationProps) {
+  const { t } = useTranslation();
   const [selectedRange, setSelectedRange] = useState(0);
 
   // Convert degrees to radians
@@ -70,13 +72,13 @@ export function PositionByRotation({ history }: PositionByRotationProps) {
   return (
     <div className="position-by-rotation">
       <div className="rotation-range-selector">
-        {ROTATION_RANGES.map((range, index) => (
+        {ROTATION_RANGES.map((_, index) => (
           <button
-            key={range.label}
+            key={t.rotationRanges[index]}
             className={`rotation-range-btn ${selectedRange === index ? 'active' : ''}`}
             onClick={() => setSelectedRange(index)}
           >
-            <span className="range-label">{range.label}</span>
+            <span className="range-label">{t.rotationRanges[index]}</span>
             <span className="range-count">({rangeCounts[index]})</span>
           </button>
         ))}
@@ -84,7 +86,7 @@ export function PositionByRotation({ history }: PositionByRotationProps) {
 
       <div className="rotation-range-info">
         <span className="range-exercises">
-          {rangeStats.count} exercice{rangeStats.count !== 1 ? 's' : ''}
+          {rangeStats.count} {t.exerciseCount}
         </span>
         {rangeStats.count > 0 && (
           <span
@@ -93,7 +95,7 @@ export function PositionByRotation({ history }: PositionByRotationProps) {
               color: rangeStats.avgScore >= 70 ? '#26a269' : rangeStats.avgScore >= 40 ? '#e5a50a' : '#c01c28',
             }}
           >
-            Score moyen: {rangeStats.avgScore}
+            {t.averageScoreLabel} {rangeStats.avgScore}
           </span>
         )}
       </div>
@@ -101,7 +103,7 @@ export function PositionByRotation({ history }: PositionByRotationProps) {
       <div className="rotation-heatmap-container">
         {rangeStats.count === 0 ? (
           <div className="rotation-empty">
-            <p>Pas de données pour cette plage de rotation</p>
+            <p>{t.noDataForRotation}</p>
           </div>
         ) : (
           <HeatmapCanvas data={heatmapData} />

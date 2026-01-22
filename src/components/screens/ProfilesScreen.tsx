@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { useTranslation } from '../../hooks/useTranslation';
 import { getExplorationProgress } from '../../utils/storage';
 
 interface ProfilesScreenProps {
@@ -17,6 +18,7 @@ export function ProfilesScreen({ onBack }: ProfilesScreenProps) {
     exportCurrentProfile,
     importProfile,
   } = useSettings();
+  const { t } = useTranslation();
 
   const [newProfileName, setNewProfileName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -54,7 +56,7 @@ export function ProfilesScreen({ onBack }: ProfilesScreenProps) {
       const content = event.target?.result as string;
       const success = importProfile(content);
       if (!success) {
-        alert('Erreur lors de l\'importation du profil. Vérifiez le format du fichier.');
+        alert(t.importError);
       }
     };
     reader.readAsText(file);
@@ -78,10 +80,10 @@ export function ProfilesScreen({ onBack }: ProfilesScreenProps) {
 
   const handleDeleteProfile = (id: string, name: string) => {
     if (profiles.length <= 1) {
-      alert('Vous devez garder au moins un profil.');
+      alert(t.minProfileError);
       return;
     }
-    if (confirm(`Supprimer le profil "${name}" ? Cette action est irréversible.`)) {
+    if (confirm(t.deleteProfileConfirm.replace('{name}', name))) {
       deleteProfile(id);
     }
   };
@@ -90,30 +92,30 @@ export function ProfilesScreen({ onBack }: ProfilesScreenProps) {
     <div className="screen">
       <div className="screen-header">
         <button className="btn btn-secondary btn-back" onClick={onBack}>
-          Retour
+          {t.back}
         </button>
-        <h1 className="screen-title">Profils</h1>
+        <h1 className="screen-title">{t.profilesTitle}</h1>
       </div>
 
       <div className="screen-content">
         {/* Current profile info */}
         {currentProfile && (
           <div className="profile-current">
-            <h2 className="settings-section-title">Profil actif</h2>
+            <h2 className="settings-section-title">{t.activeProfile}</h2>
             <div className="profile-card active">
               <div className="profile-info">
                 <div className="profile-name">{currentProfile.name}</div>
                 <div className="profile-stats">
-                  {currentProfile.history.length} exercices
+                  {currentProfile.history.length} {t.exercises}
                   {!currentProfile.exploration.explorationComplete && (
                     <span className="exploration-badge">
-                      Exploration: {Math.round(getExplorationProgress(currentProfile.exploration).total * 100)}%
+                      {t.exploration} {Math.round(getExplorationProgress(currentProfile.exploration).total * 100)}%
                     </span>
                   )}
                 </div>
               </div>
               <button className="btn btn-primary" onClick={handleExport}>
-                Exporter
+                {t.export}
               </button>
             </div>
           </div>
@@ -121,7 +123,7 @@ export function ProfilesScreen({ onBack }: ProfilesScreenProps) {
 
         {/* All profiles */}
         <div className="settings-section">
-          <h2 className="settings-section-title">Tous les profils</h2>
+          <h2 className="settings-section-title">{t.allProfiles}</h2>
 
           {profiles.map(profile => (
             <div
@@ -149,24 +151,24 @@ export function ProfilesScreen({ onBack }: ProfilesScreenProps) {
                   >
                     <div className="profile-name">
                       {profile.name}
-                      {profile.id === currentProfile?.id && <span className="current-badge">actif</span>}
+                      {profile.id === currentProfile?.id && <span className="current-badge">{t.active}</span>}
                     </div>
                     <div className="profile-stats">
-                      {profile.history.length} exercices
+                      {profile.history.length} {t.exercises}
                     </div>
                   </div>
                   <div className="profile-actions">
                     <button
                       className="btn-icon-small"
                       onClick={() => handleStartEdit(profile.id, profile.name)}
-                      title="Renommer"
+                      title={t.rename}
                     >
                       ✏️
                     </button>
                     <button
                       className="btn-icon-small"
                       onClick={() => handleDeleteProfile(profile.id, profile.name)}
-                      title="Supprimer"
+                      title={t.delete}
                     >
                       🗑️
                     </button>
@@ -179,11 +181,11 @@ export function ProfilesScreen({ onBack }: ProfilesScreenProps) {
 
         {/* Create new profile */}
         <div className="settings-section">
-          <h2 className="settings-section-title">Nouveau profil</h2>
+          <h2 className="settings-section-title">{t.newProfile}</h2>
           <div className="new-profile-form">
             <input
               type="text"
-              placeholder="Nom du profil"
+              placeholder={t.profileNamePlaceholder}
               value={newProfileName}
               onChange={e => setNewProfileName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleCreateProfile()}
@@ -193,16 +195,16 @@ export function ProfilesScreen({ onBack }: ProfilesScreenProps) {
               onClick={handleCreateProfile}
               disabled={!newProfileName.trim()}
             >
-              Créer
+              {t.create}
             </button>
           </div>
         </div>
 
         {/* Import */}
         <div className="settings-section">
-          <h2 className="settings-section-title">Importer</h2>
+          <h2 className="settings-section-title">{t.importSection}</h2>
           <button className="btn btn-secondary" onClick={handleImportClick}>
-            Importer un profil
+            {t.importProfile}
           </button>
           <input
             ref={fileInputRef}

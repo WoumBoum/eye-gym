@@ -457,6 +457,22 @@ input:checked + .toggle-slider:before {
   border: none;
 }
 
+.language-select {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.language-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
 .settings-actions {
   display: flex;
   flex-direction: column;

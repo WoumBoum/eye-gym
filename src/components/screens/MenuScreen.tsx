@@ -1,5 +1,6 @@
 import { Screen } from '../../types';
 import { useSettings } from '../../context/SettingsContext';
+import { useTranslation } from '../../hooks/useTranslation';
 import { getExplorationProgress } from '../../utils/storage';
 
 interface MenuScreenProps {
@@ -8,20 +9,21 @@ interface MenuScreenProps {
 
 export function MenuScreen({ onNavigate }: MenuScreenProps) {
   const { currentProfile, exploration } = useSettings();
+  const { t } = useTranslation();
   const explorationProgress = getExplorationProgress(exploration);
 
   return (
     <div className="screen menu-screen">
       <h1 className="menu-title">Eye Gym</h1>
-      <p className="menu-subtitle">Entraînement visuel</p>
+      <p className="menu-subtitle">{t.visualTraining}</p>
 
       {currentProfile && (
         <div className="menu-profile-badge" onClick={() => onNavigate('profiles')}>
           <span className="profile-name">{currentProfile.name}</span>
-          <span className="profile-exercise-count">{currentProfile.history.length} exercices</span>
+          <span className="profile-exercise-count">{currentProfile.history.length} {t.exercises}</span>
           {!exploration.explorationComplete && (
             <span className="profile-exploration">
-              Exploration: {Math.round(explorationProgress.total * 100)}%
+              {t.exploration} {Math.round(explorationProgress.total * 100)}%
             </span>
           )}
         </div>
@@ -29,16 +31,16 @@ export function MenuScreen({ onNavigate }: MenuScreenProps) {
 
       <div className="menu-buttons">
         <button className="btn btn-primary" onClick={() => onNavigate('game')}>
-          Jouer
+          {t.play}
         </button>
         <button className="btn btn-secondary" onClick={() => onNavigate('statistics')}>
-          Statistiques
+          {t.statistics}
         </button>
         <button className="btn btn-secondary" onClick={() => onNavigate('settings')}>
-          Paramètres
+          {t.settings}
         </button>
         <button className="btn btn-secondary" onClick={() => onNavigate('profiles')}>
-          Profils
+          {t.profiles}
         </button>
       </div>
     </div>
