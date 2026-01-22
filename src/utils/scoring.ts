@@ -2,8 +2,12 @@ import { Point } from '../types';
 import { distance } from './geometry';
 
 // Calculate score based on distance from ideal position
-// score = max(0, 100 × (1 - distance / maxError))
-// where maxError = dist(darkBlue, darkRed) × 0.5
+// Uses Gaussian decay: score = 100 × exp(-(distance/σ)²)
+// This gives:
+// - 100 for pixel perfect
+// - Quick drop for small errors
+// - Slower drop for larger errors (asymptotic to 0)
+// - Score 0 is as improbable as score 100
 export function calculateScore(
   userPoint: Point,
   idealPoint: Point,
@@ -12,9 +16,13 @@ export function calculateScore(
 ): { score: number; distance: number } {
   const userDistance = distance(userPoint, idealPoint);
   const referenceDistance = distance(darkBlue, darkRed);
-  const maxError = referenceDistance * 0.5;
 
-  const score = Math.max(0, 100 * (1 - userDistance / maxError));
+  // Sigma controls the spread - at distance = sigma, score ≈ 37
+  // At distance = 2*sigma, score ≈ 1.8
+  const sigma = referenceDistance * 0.4;
+
+  const normalizedDistance = userDistance / sigma;
+  const score = 100 * Math.exp(-normalizedDistance * normalizedDistance);
 
   return {
     score: Math.round(score * 10) / 10, // Round to 1 decimal

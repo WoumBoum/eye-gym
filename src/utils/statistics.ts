@@ -1,4 +1,15 @@
-import { Exercise, StatsSummary, HeatmapData, CurveData } from '../types';
+import {
+  Exercise,
+  StatsSummary,
+  HeatmapData,
+  CurveData,
+  HEATMAP_MIN_X,
+  HEATMAP_MAX_X,
+  HEATMAP_MIN_Y,
+  HEATMAP_MAX_Y,
+  HEATMAP_GRID_WIDTH,
+  HEATMAP_GRID_HEIGHT,
+} from '../types';
 
 // Calculate summary statistics
 export function calculateStats(history: Exercise[]): StatsSummary {
@@ -26,12 +37,71 @@ export function calculateStats(history: Exercise[]): StatsSummary {
   };
 }
 
+// Transform a point from pixel coordinates to normalized heatmap coordinates
+// The coordinate system is defined such that:
+// - Blue point is at (+0.5, 0)
+// - Red point is at (-0.5, 0)
+// - The segment between them has length 1
+function toNormalizedCoordinates(
+  point: { x: number; y: number },
+  darkBlue: { x: number; y: number },
+  darkRed: { x: number; y: number }
+): { x: number; y: number } {
+  // Calculate midpoint of blue-red segment (this becomes the origin)
+  const midX = (darkBlue.x + darkRed.x) / 2;
+  const midY = (darkBlue.y + darkRed.y) / 2;
+
+  // Calculate the segment length (this becomes 1 unit in normalized space)
+  const dx = darkBlue.x - darkRed.x;
+  const dy = darkBlue.y - darkRed.y;
+  const segmentLength = Math.sqrt(dx * dx + dy * dy);
+
+  if (segmentLength === 0) {
+    return { x: 0, y: 0 };
+  }
+
+  // Unit vectors for the local coordinate system
+  // X-axis: from red to blue (positive direction)
+  const uxX = dx / segmentLength;
+  const uxY = dy / segmentLength;
+  // Y-axis: perpendicular to X-axis (90° counterclockwise)
+  const uyX = -uxY;
+  const uyY = uxX;
+
+  // Transform point to local coordinates relative to midpoint
+  const localX = point.x - midX;
+  const localY = point.y - midY;
+
+  // Project onto local coordinate system and normalize by segment length
+  const normalizedX = (localX * uxX + localY * uxY) / segmentLength;
+  const normalizedY = (localX * uyX + localY * uyY) / segmentLength;
+
+  return { x: normalizedX, y: normalizedY };
+}
+
+// Convert normalized coordinates to grid cell indices
+function coordinateToCell(x: number, y: number): { col: number; row: number } | null {
+  // Check bounds
+  if (x < HEATMAP_MIN_X || x > HEATMAP_MAX_X || y < HEATMAP_MIN_Y || y > HEATMAP_MAX_Y) {
+    return null;
+  }
+
+  // Map to grid cell (70 columns, 50 rows)
+  const col = Math.floor((x - HEATMAP_MIN_X) / (HEATMAP_MAX_X - HEATMAP_MIN_X) * HEATMAP_GRID_WIDTH);
+  const row = Math.floor((y - HEATMAP_MIN_Y) / (HEATMAP_MAX_Y - HEATMAP_MIN_Y) * HEATMAP_GRID_HEIGHT);
+
+  return {
+    col: Math.max(0, Math.min(HEATMAP_GRID_WIDTH - 1, col)),
+    row: Math.max(0, Math.min(HEATMAP_GRID_HEIGHT - 1, row)),
+  };
+}
+
 // Generate heatmap data from exercise history
-export function generateHeatmapData(
-  history: Exercise[],
-  gridWidth: number = 20,
-  gridHeight: number = 14
-): HeatmapData {
+// Uses a 70x50 grid covering the coordinate space from (-3.5, -2.5) to (3.5, 2.5)
+export function generateHeatmapData(history: Exercise[]): HeatmapData {
+  const gridWidth = HEATMAP_GRID_WIDTH;
+  const gridHeight = HEATMAP_GRID_HEIGHT;
+
   const scores: number[][] = [];
   const counts: number[][] = [];
   const sums: number[][] = [];
@@ -43,24 +113,23 @@ export function generateHeatmapData(
     sums[y] = new Array(gridWidth).fill(0);
   }
 
-  // Aggregate scores by position (using idealGreen position)
+  // Aggregate scores by normalized position
   for (const exercise of history) {
-    if (!exercise.idealGreen) continue;
+    if (!exercise.idealGreen || !exercise.darkBlue || !exercise.darkRed) continue;
 
-    // We need to know the canvas size at the time of the exercise
-    // For now, use normalized positions (0-1 range)
-    // Assuming positions were stored as absolute pixels, we normalize
-    // This is a simplification - in practice, you'd store normalized positions
+    // Transform idealGreen to normalized coordinate system
+    const normalized = toNormalizedCoordinates(
+      exercise.idealGreen,
+      exercise.darkBlue,
+      exercise.darkRed
+    );
 
-    // Use the relative position within a typical canvas
-    const normalizedX = Math.min(1, Math.max(0, exercise.idealGreen.x / 1000));
-    const normalizedY = Math.min(1, Math.max(0, exercise.idealGreen.y / 700));
+    // Map to grid cell
+    const cell = coordinateToCell(normalized.x, normalized.y);
+    if (!cell) continue;
 
-    const gridX = Math.min(gridWidth - 1, Math.floor(normalizedX * gridWidth));
-    const gridY = Math.min(gridHeight - 1, Math.floor(normalizedY * gridHeight));
-
-    sums[gridY][gridX] += exercise.score;
-    counts[gridY][gridX]++;
+    sums[cell.row][cell.col] += exercise.score;
+    counts[cell.row][cell.col]++;
   }
 
   // Calculate averages

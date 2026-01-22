@@ -100,11 +100,24 @@ export interface StatsSummary {
 }
 
 export interface HeatmapData {
-  width: number;
-  height: number;
-  scores: number[][]; // average score per cell
+  width: number;  // 70 columns
+  height: number; // 50 rows
+  scores: number[][]; // average score per cell (0-100)
   counts: number[][]; // number of exercises per cell
 }
+
+// Heatmap coordinate system constants
+export const HEATMAP_MIN_X = -3.5;
+export const HEATMAP_MAX_X = 3.5;
+export const HEATMAP_MIN_Y = -2.5;
+export const HEATMAP_MAX_Y = 2.5;
+export const HEATMAP_GRID_WIDTH = 70;
+export const HEATMAP_GRID_HEIGHT = 50;
+export const HEATMAP_CELL_SIZE = 0.1;
+
+// Reference points for heatmap visualization
+export const HEATMAP_BLUE_POINT = { x: 0.5, y: 0 };
+export const HEATMAP_RED_POINT = { x: -0.5, y: 0 };
 
 export interface CurveData {
   labels: number[];
