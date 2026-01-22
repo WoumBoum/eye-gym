@@ -55,3 +55,9 @@ coverage/
 
 # PWA dev files
 dev-dist/
+
+# Capacitor / Mobile builds
+android/
+ios/
+capacitor.config.ts
+capacitor.config.js
