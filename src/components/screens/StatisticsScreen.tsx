@@ -5,6 +5,7 @@ import { HeatmapCanvas } from '../statistics/HeatmapCanvas';
 import { RatioCurve } from '../statistics/RatioCurve';
 import { AngleCurve } from '../statistics/AngleCurve';
 import { AngleDeltaCurve } from '../statistics/AngleDeltaCurve';
+import { PositionByRotation } from '../statistics/PositionByRotation';
 import { TimelineEvolution } from '../statistics/TimelineEvolution';
 import {
   calculateStats,
@@ -18,7 +19,7 @@ interface StatisticsScreenProps {
   onBack: () => void;
 }
 
-type Tab = 'global' | 'heatmap' | 'ratio' | 'angle' | 'rotation' | 'timeline';
+type Tab = 'global' | 'heatmap' | 'ratio' | 'angle' | 'rotation' | 'pos-rotation' | 'timeline';
 
 export function StatisticsScreen({ onBack }: StatisticsScreenProps) {
   const { history } = useSettings();
@@ -36,6 +37,7 @@ export function StatisticsScreen({ onBack }: StatisticsScreenProps) {
     { id: 'ratio', label: 'Ratios' },
     { id: 'angle', label: 'Angles' },
     { id: 'rotation', label: 'Rotation' },
+    { id: 'pos-rotation', label: 'Pos/Rot' },
     { id: 'timeline', label: 'Évolution' },
   ];
 
@@ -74,6 +76,7 @@ export function StatisticsScreen({ onBack }: StatisticsScreenProps) {
               {activeTab === 'ratio' && <RatioCurve data={ratioCurve} />}
               {activeTab === 'angle' && <AngleCurve data={angleCurve} />}
               {activeTab === 'rotation' && <AngleDeltaCurve data={angleDeltaCurve} />}
+              {activeTab === 'pos-rotation' && <PositionByRotation history={history} />}
               {activeTab === 'timeline' && <TimelineEvolution history={history} />}
             </div>
           </>

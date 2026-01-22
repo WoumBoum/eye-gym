@@ -913,3 +913,86 @@ body.dark-mode .timeline-view-btn.active {
   color: var(--color-text-light);
   font-style: italic;
 }
+
+/* Position by Rotation */
+.position-by-rotation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.rotation-range-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  justify-content: center;
+}
+
+.rotation-range-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  min-width: 70px;
+}
+
+.rotation-range-btn:hover {
+  border-color: var(--color-primary);
+}
+
+.rotation-range-btn.active {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.rotation-range-btn .range-label {
+  font-weight: 600;
+}
+
+.rotation-range-btn .range-count {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+body.dark-mode .rotation-range-btn {
+  background: #2a2a2a;
+}
+
+body.dark-mode .rotation-range-btn.active {
+  background: var(--color-primary);
+}
+
+.rotation-range-info {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  font-size: 0.95rem;
+}
+
+.range-exercises {
+  color: var(--color-text-light);
+}
+
+.range-avg-score {
+  font-weight: 600;
+}
+
+.rotation-heatmap-container {
+  min-height: 250px;
+}
+
+.rotation-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 250px;
+  color: var(--color-text-light);
+  font-style: italic;
+}

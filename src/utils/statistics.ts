@@ -247,3 +247,59 @@ export function generateAngleDeltaCurve(history: Exercise[], buckets: number = 1
 
   return { labels, scores, counts };
 }
+
+// Generate heatmap data filtered by rotation range
+export function generateHeatmapDataByRotation(
+  history: Exercise[],
+  minRotation: number, // in radians (0 to π)
+  maxRotation: number  // in radians (0 to π)
+): HeatmapData {
+  const gridWidth = HEATMAP_GRID_WIDTH;
+  const gridHeight = HEATMAP_GRID_HEIGHT;
+
+  const scores: number[][] = [];
+  const counts: number[][] = [];
+  const sums: number[][] = [];
+
+  // Initialize grids
+  for (let y = 0; y < gridHeight; y++) {
+    scores[y] = new Array(gridWidth).fill(0);
+    counts[y] = new Array(gridWidth).fill(0);
+    sums[y] = new Array(gridWidth).fill(0);
+  }
+
+  // Aggregate scores by normalized position, filtered by rotation
+  for (const exercise of history) {
+    if (!exercise.idealGreen || !exercise.darkBlue || !exercise.darkRed) continue;
+    if (exercise.angleDelta === undefined) continue;
+
+    // Check if rotation is in range
+    const absAngleDelta = Math.abs(exercise.angleDelta);
+    if (absAngleDelta < minRotation || absAngleDelta >= maxRotation) continue;
+
+    // Transform idealGreen to normalized coordinate system
+    const normalized = toNormalizedCoordinates(
+      exercise.idealGreen,
+      exercise.darkBlue,
+      exercise.darkRed
+    );
+
+    // Map to grid cell
+    const cell = coordinateToCell(normalized.x, normalized.y);
+    if (!cell) continue;
+
+    sums[cell.row][cell.col] += exercise.score;
+    counts[cell.row][cell.col]++;
+  }
+
+  // Calculate averages
+  for (let y = 0; y < gridHeight; y++) {
+    for (let x = 0; x < gridWidth; x++) {
+      if (counts[y][x] > 0) {
+        scores[y][x] = sums[y][x] / counts[y][x];
+      }
+    }
+  }
+
+  return { width: gridWidth, height: gridHeight, scores, counts };
+}

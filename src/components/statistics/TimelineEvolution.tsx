@@ -3,17 +3,19 @@ import { Exercise } from '../../types';
 import { HeatmapCanvas } from './HeatmapCanvas';
 import { RatioCurve } from './RatioCurve';
 import { AngleCurve } from './AngleCurve';
+import { AngleDeltaCurve } from './AngleDeltaCurve';
 import {
   generateHeatmapData,
   generateRatioCurve,
   generateAngleCurve,
+  generateAngleDeltaCurve,
 } from '../../utils/statistics';
 
 interface TimelineEvolutionProps {
   history: Exercise[];
 }
 
-type ViewMode = 'heatmap' | 'ratio' | 'angle';
+type ViewMode = 'heatmap' | 'ratio' | 'angle' | 'rotation';
 
 export function TimelineEvolution({ history }: TimelineEvolutionProps) {
   const [exerciseIndex, setExerciseIndex] = useState(history.length);
@@ -29,6 +31,7 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
   const heatmapData = useMemo(() => generateHeatmapData(filteredHistory), [filteredHistory]);
   const ratioCurve = useMemo(() => generateRatioCurve(filteredHistory), [filteredHistory]);
   const angleCurve = useMemo(() => generateAngleCurve(filteredHistory), [filteredHistory]);
+  const angleDeltaCurve = useMemo(() => generateAngleDeltaCurve(filteredHistory), [filteredHistory]);
 
   // Format date for display
   const formatDate = (timestamp: number): string => {
@@ -83,6 +86,7 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
     { id: 'heatmap', label: 'Positions' },
     { id: 'ratio', label: 'Ratios' },
     { id: 'angle', label: 'Angles' },
+    { id: 'rotation', label: 'Rotation' },
   ];
 
   return (
@@ -157,6 +161,7 @@ export function TimelineEvolution({ history }: TimelineEvolutionProps) {
             {viewMode === 'heatmap' && <HeatmapCanvas data={heatmapData} />}
             {viewMode === 'ratio' && <RatioCurve data={ratioCurve} />}
             {viewMode === 'angle' && <AngleCurve data={angleCurve} />}
+            {viewMode === 'rotation' && <AngleDeltaCurve data={angleDeltaCurve} />}
           </>
         )}
       </div>
