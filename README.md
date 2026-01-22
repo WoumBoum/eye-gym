@@ -2,6 +2,8 @@
 
 A visual training application that helps users improve their spatial perception by reproducing triangle shapes. Built with React 18, TypeScript, and Vite.
 
+**You currently can test the game at :** [[https://woumboum.github.io/eye-gym/]]
+
 ## Overview
 
 Eye Gym presents users with a reference triangle (light-colored) and asks them to complete a second triangle (dark-colored) by placing a third point. The app uses adaptive difficulty through gradient-based sampling, focusing practice on areas where the user needs improvement.
