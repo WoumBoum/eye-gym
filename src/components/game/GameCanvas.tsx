@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useCanvas } from '../../hooks/useCanvas';
 import { useSettings } from '../../context/SettingsContext';
 import { Point, GamePhase } from '../../types';
@@ -53,6 +53,7 @@ export function GameCanvas({
 }: GameCanvasProps) {
   const { canvasRef, containerRef, size, getContext } = useCanvas();
   const { settings } = useSettings();
+  const isDragging = useRef(false);
 
   const COLORS = settings.darkMode ? COLORS_DARK : COLORS_LIGHT;
 
@@ -161,35 +162,57 @@ export function GameCanvas({
     render();
   }, [render]);
 
-  // Handle touch/click events
-  const handleInteraction = useCallback(
-    (clientX: number, clientY: number) => {
-      if (!containerRef.current) return;
+  // Convert client coordinates to canvas coordinates
+  const getCanvasPoint = useCallback(
+    (clientX: number, clientY: number): Point | null => {
+      if (!containerRef.current) return null;
 
       const rect = containerRef.current.getBoundingClientRect();
       const x = clientX - rect.left;
       const y = clientY - rect.top;
 
-      onTap({ x, y });
+      return { x, y };
     },
-    [onTap, containerRef]
+    [containerRef]
   );
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      handleInteraction(e.clientX, e.clientY);
-    },
-    [handleInteraction]
-  );
-
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
+  // Handle pointer down - start dragging
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
       e.preventDefault();
-      if (e.touches.length > 0) {
-        handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
+      isDragging.current = true;
+
+      // Capture pointer to receive events even if pointer leaves element
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+
+      const point = getCanvasPoint(e.clientX, e.clientY);
+      if (point) {
+        onTap(point);
       }
     },
-    [handleInteraction]
+    [getCanvasPoint, onTap]
+  );
+
+  // Handle pointer move - update position while dragging
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging.current) return;
+
+      const point = getCanvasPoint(e.clientX, e.clientY);
+      if (point) {
+        onTap(point);
+      }
+    },
+    [getCanvasPoint, onTap]
+  );
+
+  // Handle pointer up - stop dragging
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      isDragging.current = false;
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    },
+    []
   );
 
   return (
@@ -197,8 +220,11 @@ export function GameCanvas({
       <canvas
         ref={canvasRef}
         className="game-canvas"
-        onClick={handleClick}
-        onTouchStart={handleTouchStart}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        style={{ touchAction: 'none' }}
       />
     </div>
   );

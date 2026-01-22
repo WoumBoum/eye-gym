@@ -4,19 +4,21 @@ import { GlobalStats } from '../statistics/GlobalStats';
 import { HeatmapCanvas } from '../statistics/HeatmapCanvas';
 import { RatioCurve } from '../statistics/RatioCurve';
 import { AngleCurve } from '../statistics/AngleCurve';
+import { AngleDeltaCurve } from '../statistics/AngleDeltaCurve';
 import { TimelineEvolution } from '../statistics/TimelineEvolution';
 import {
   calculateStats,
   generateHeatmapData,
   generateRatioCurve,
   generateAngleCurve,
+  generateAngleDeltaCurve,
 } from '../../utils/statistics';
 
 interface StatisticsScreenProps {
   onBack: () => void;
 }
 
-type Tab = 'global' | 'heatmap' | 'ratio' | 'angle' | 'timeline';
+type Tab = 'global' | 'heatmap' | 'ratio' | 'angle' | 'rotation' | 'timeline';
 
 export function StatisticsScreen({ onBack }: StatisticsScreenProps) {
   const { history } = useSettings();
@@ -26,12 +28,14 @@ export function StatisticsScreen({ onBack }: StatisticsScreenProps) {
   const heatmapData = useMemo(() => generateHeatmapData(history), [history]);
   const ratioCurve = useMemo(() => generateRatioCurve(history), [history]);
   const angleCurve = useMemo(() => generateAngleCurve(history), [history]);
+  const angleDeltaCurve = useMemo(() => generateAngleDeltaCurve(history), [history]);
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'global', label: 'Résumé' },
     { id: 'heatmap', label: 'Positions' },
     { id: 'ratio', label: 'Ratios' },
     { id: 'angle', label: 'Angles' },
+    { id: 'rotation', label: 'Rotation' },
     { id: 'timeline', label: 'Évolution' },
   ];
 
@@ -69,6 +73,7 @@ export function StatisticsScreen({ onBack }: StatisticsScreenProps) {
               {activeTab === 'heatmap' && <HeatmapCanvas data={heatmapData} />}
               {activeTab === 'ratio' && <RatioCurve data={ratioCurve} />}
               {activeTab === 'angle' && <AngleCurve data={angleCurve} />}
+              {activeTab === 'rotation' && <AngleDeltaCurve data={angleDeltaCurve} />}
               {activeTab === 'timeline' && <TimelineEvolution history={history} />}
             </div>
           </>

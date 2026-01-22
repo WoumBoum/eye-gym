@@ -24,7 +24,8 @@ export interface Exercise {
   angleBucket: number;
   // Raw values
   ratio: number;
-  angle: number;
+  angle: number; // angle of green point relative to blue-red line (0 to 2π)
+  angleDelta: number; // rotation delta between model and dark triangles (-π to π)
   // Result
   score: number;
   distance: number;

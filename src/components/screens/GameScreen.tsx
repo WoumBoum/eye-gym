@@ -28,6 +28,7 @@ interface ExerciseState {
   idealGreen: Point;
   ratio: number;
   angle: number;
+  angleDelta: number;
   positionBucketX: number;
   positionBucketY: number;
   ratioBucket: number;
@@ -91,6 +92,7 @@ export function GameScreen({ onBack }: GameScreenProps) {
         angleBucket: exercise.angleBucket,
         ratio: exercise.ratio,
         angle: exercise.angle,
+        angleDelta: exercise.angleDelta,
         score,
         distance: dist,
       };
@@ -211,6 +213,7 @@ export function GameScreen({ onBack }: GameScreenProps) {
           idealGreen,
           ratio,
           angle: sampledAngle,
+          angleDelta,
           positionBucketX,
           positionBucketY,
           ratioBucket,
@@ -242,6 +245,7 @@ export function GameScreen({ onBack }: GameScreenProps) {
       idealGreen: { x: centerX, y: centerY + size - size * 0.8 },
       ratio: 1,
       angle: Math.PI / 2,
+      angleDelta: 0,
       positionBucketX: 5,
       positionBucketY: 3,
       ratioBucket: 7,

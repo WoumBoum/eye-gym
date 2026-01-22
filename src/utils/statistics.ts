@@ -111,7 +111,7 @@ export function generateRatioCurve(history: Exercise[], buckets: number = 15): C
   return { labels, scores, counts };
 }
 
-// Generate angle curve data
+// Generate angle curve data (angle of green point relative to blue-red line)
 export function generateAngleCurve(history: Exercise[], buckets: number = 24): CurveData {
   const bucketWidth = (2 * Math.PI) / buckets;
 
@@ -129,6 +129,42 @@ export function generateAngleCurve(history: Exercise[], buckets: number = 24): C
   for (const exercise of history) {
     const angle = exercise.angle;
     const bucket = Math.min(buckets - 1, Math.floor(angle / bucketWidth));
+    sums[bucket] += exercise.score;
+    counts[bucket]++;
+  }
+
+  // Calculate averages
+  for (let i = 0; i < buckets; i++) {
+    if (counts[i] > 0) {
+      scores[i] = Math.round((sums[i] / counts[i]) * 10) / 10;
+    }
+  }
+
+  return { labels, scores, counts };
+}
+
+// Generate angle delta curve data (rotation between model and dark triangles)
+export function generateAngleDeltaCurve(history: Exercise[], buckets: number = 12): CurveData {
+  // angleDelta ranges from -π to +π, we use absolute value (0 to π)
+  const bucketWidth = Math.PI / buckets;
+
+  const labels: number[] = [];
+  const scores: number[] = new Array(buckets).fill(0);
+  const counts: number[] = new Array(buckets).fill(0);
+  const sums: number[] = new Array(buckets).fill(0);
+
+  // Generate bucket labels (in degrees, 0° to 180°)
+  for (let i = 0; i < buckets; i++) {
+    labels.push(Math.round(((i + 0.5) * bucketWidth * 180) / Math.PI));
+  }
+
+  // Aggregate by absolute angleDelta
+  for (const exercise of history) {
+    // Handle old exercises that don't have angleDelta
+    if (exercise.angleDelta === undefined) continue;
+
+    const absAngleDelta = Math.abs(exercise.angleDelta);
+    const bucket = Math.min(buckets - 1, Math.floor(absAngleDelta / bucketWidth));
     sums[bucket] += exercise.score;
     counts[bucket]++;
   }
