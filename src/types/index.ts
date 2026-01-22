@@ -41,6 +41,7 @@ export interface Settings {
   sigma3: number; // F3 gradient spread
   learningRate: number; // gradient update rate
   darkMode: boolean; // dark mode theme
+  pointSize: number; // size of points in pixels (12-36)
 }
 
 // Gradient grids

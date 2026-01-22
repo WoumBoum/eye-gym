@@ -27,8 +27,6 @@ const COLORS_DARK = {
   background: '#1a1a1a',
 };
 
-const POINT_SIZE = 24;
-const POINT_SIZE_SMALL = 18;
 
 interface GameCanvasProps {
   phase: GamePhase;
@@ -87,6 +85,10 @@ export function GameCanvas({
     const ctx = getContext();
     if (!ctx || size.width === 0) return;
 
+    // Point sizes from settings
+    const pointSize = settings.pointSize;
+    const pointSizeSmall = Math.round(pointSize * 0.5);
+
     // Clear canvas
     ctx.fillStyle = COLORS.background;
     ctx.fillRect(0, 0, size.width, size.height);
@@ -99,17 +101,17 @@ export function GameCanvas({
       drawLine(ctx, modelGreen, modelBlue, COLORS.clearGreen + '40', 2);
 
       // Draw points
-      drawPoint(ctx, modelBlue, COLORS.clearBlue, POINT_SIZE_SMALL / 2);
-      drawPoint(ctx, modelRed, COLORS.clearRed, POINT_SIZE_SMALL / 2);
-      drawPoint(ctx, modelGreen, COLORS.clearGreen, POINT_SIZE_SMALL / 2);
+      drawPoint(ctx, modelBlue, COLORS.clearBlue, pointSizeSmall / 2);
+      drawPoint(ctx, modelRed, COLORS.clearRed, pointSizeSmall / 2);
+      drawPoint(ctx, modelGreen, COLORS.clearGreen, pointSizeSmall / 2);
     }
 
     // Draw dark blue and red points
     if (darkBlue) {
-      drawPoint(ctx, darkBlue, COLORS.darkBlue, POINT_SIZE / 2);
+      drawPoint(ctx, darkBlue, COLORS.darkBlue, pointSize / 2);
     }
     if (darkRed) {
-      drawPoint(ctx, darkRed, COLORS.darkRed, POINT_SIZE / 2);
+      drawPoint(ctx, darkRed, COLORS.darkRed, pointSize / 2);
     }
 
     // Draw line between dark blue and red
@@ -119,7 +121,7 @@ export function GameCanvas({
 
     // In feedback phase, show ideal green position
     if (phase === 'feedback' && idealGreen) {
-      drawPoint(ctx, idealGreen, COLORS.darkGreen, POINT_SIZE / 2);
+      drawPoint(ctx, idealGreen, COLORS.darkGreen, pointSize / 2);
 
       // Draw lines to show correct triangle
       if (darkBlue && darkRed) {
@@ -130,7 +132,7 @@ export function GameCanvas({
 
     // Draw user's guess
     if (userGreen) {
-      drawPoint(ctx, userGreen, COLORS.userPoint, POINT_SIZE / 2);
+      drawPoint(ctx, userGreen, COLORS.userPoint, pointSize / 2);
 
       // In feedback, show error line from user to ideal
       if (phase === 'feedback' && idealGreen) {
@@ -151,6 +153,7 @@ export function GameCanvas({
     drawPoint,
     drawLine,
     COLORS,
+    settings.pointSize,
   ]);
 
   // Re-render when state changes

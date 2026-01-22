@@ -22,6 +22,7 @@ export const DEFAULT_SETTINGS: Settings = {
   sigma3: 3,
   learningRate: 0.1,
   darkMode: false,
+  pointSize: 18,
 };
 
 // Create default exploration state

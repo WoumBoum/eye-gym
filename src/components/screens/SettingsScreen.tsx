@@ -56,6 +56,10 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     updateSettings({ darkMode: e.target.checked });
   };
 
+  const handlePointSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateSettings({ pointSize: parseInt(e.target.value, 10) });
+  };
+
   const handleResetSettings = () => {
     if (confirm('Réinitialiser tous les paramètres aux valeurs par défaut ?')) {
       resetSettings();
@@ -100,6 +104,24 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
                 />
                 <span className="toggle-slider"></span>
               </label>
+            </div>
+          </div>
+
+          <div className="setting-row">
+            <div>
+              <div className="setting-label">Taille des points</div>
+              <div className="setting-value">{settings.pointSize} px</div>
+            </div>
+            <div className="setting-control">
+              <input
+                type="range"
+                className="slider"
+                min="4"
+                max="32"
+                step="2"
+                value={settings.pointSize}
+                onChange={handlePointSizeChange}
+              />
             </div>
           </div>
         </div>
