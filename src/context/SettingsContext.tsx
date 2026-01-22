@@ -43,6 +43,10 @@ interface ProfileContextType {
   exploration: ExplorationState;
   markExplorationTested: (posX: number, posY: number, ratioBucket: number, angleBucket: number) => void;
 
+  // Tutorial
+  hasSeenTutorial: boolean;
+  markTutorialSeen: () => void;
+
   // Export/Import
   exportCurrentProfile: () => string;
   importProfile: (jsonString: string) => boolean;
@@ -62,6 +66,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const gradients = currentProfile?.gradients || createDefaultGradients();
   const history = currentProfile?.history || [];
   const exploration = currentProfile?.exploration || createDefaultExploration();
+  const hasSeenTutorial = currentProfile?.hasSeenTutorial ?? false;
 
   // Save profile when it changes
   // Accepts either a partial profile or a function that receives the current profile and returns updates
@@ -247,6 +252,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     });
   }, [updateCurrentProfile]);
 
+  // Tutorial management
+  const markTutorialSeen = useCallback(() => {
+    updateCurrentProfile({ hasSeenTutorial: true });
+  }, [updateCurrentProfile]);
+
   // Export/Import
   const exportCurrentProfile = useCallback((): string => {
     if (!currentProfile) return '{}';
@@ -311,6 +321,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         clearExerciseHistory,
         exploration,
         markExplorationTested,
+        hasSeenTutorial,
+        markTutorialSeen,
         exportCurrentProfile,
         importProfile,
       }}

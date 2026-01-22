@@ -93,6 +93,7 @@ export interface Profile {
   gradients: Gradients;
   history: Exercise[];
   exploration: ExplorationState;
+  hasSeenTutorial: boolean;
 }
 
 // Statistics

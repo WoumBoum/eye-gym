@@ -97,6 +97,15 @@ export interface Translations {
   notBad: string;
   canDoBetter: string;
   keepPracticing: string;
+
+  // How to Play
+  howToPlay: string;
+  howToPlayIntro: string;
+  howToPlayRule: string;
+  howToPlayExample1Caption: string;
+  howToPlayExample2Caption: string;
+  howToPlayTip: string;
+  howToPlayGotIt: string;
 }
 
 export const en: Translations = {
@@ -196,6 +205,15 @@ export const en: Translations = {
   notBad: 'Not bad!',
   canDoBetter: 'Can do better',
   keepPracticing: 'Keep practicing',
+
+  // How to Play
+  howToPlay: 'How to Play',
+  howToPlayIntro: 'Eye Gym is a visual training app to improve your ability to reproduce proportions, regardless of rotation or scale changes.',
+  howToPlayRule: 'Look at the model triangle (light colors), then place the green point to complete the dark triangle with exactly the same shape and proportions as the model.',
+  howToPlayExample1Caption: 'Where should the green point go?',
+  howToPlayExample2Caption: 'The green point completes the triangle with the same proportions',
+  howToPlayTip: 'The triangle can be moved, scaled, or rotated, but never flipped.',
+  howToPlayGotIt: 'Got it!',
 };
 
 export const fr: Translations = {
@@ -295,6 +313,15 @@ export const fr: Translations = {
   notBad: 'Pas mal !',
   canDoBetter: 'Peut mieux faire',
   keepPracticing: 'Continuez à pratiquer',
+
+  // How to Play
+  howToPlay: 'Comment jouer',
+  howToPlayIntro: 'Eye Gym est un entraînement visuel pour améliorer votre capacité à reproduire des proportions, indépendamment de toute rotation ou changement d\'échelle.',
+  howToPlayRule: 'Regardez le triangle modèle (couleurs claires), puis placez le point vert pour compléter le triangle foncé avec exactement la même forme et les mêmes proportions que le modèle.',
+  howToPlayExample1Caption: 'Où placer le point vert ?',
+  howToPlayExample2Caption: 'Le point vert complète le triangle avec les mêmes proportions',
+  howToPlayTip: 'Le triangle peut être déplacé, agrandi/réduit ou pivoté, mais jamais retourné.',
+  howToPlayGotIt: 'Compris !',
 };
 
 export const translations: Record<Language, Translations> = {

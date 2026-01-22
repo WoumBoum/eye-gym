@@ -1,16 +1,33 @@
+import { useState, useEffect } from 'react';
 import { Screen } from '../../types';
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import { getExplorationProgress } from '../../utils/storage';
+import { HowToPlayModal } from '../HowToPlayModal';
 
 interface MenuScreenProps {
   onNavigate: (screen: Screen) => void;
 }
 
 export function MenuScreen({ onNavigate }: MenuScreenProps) {
-  const { currentProfile, exploration } = useSettings();
+  const { currentProfile, exploration, hasSeenTutorial, markTutorialSeen } = useSettings();
   const { t } = useTranslation();
   const explorationProgress = getExplorationProgress(exploration);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+
+  // Auto-show tutorial for new users
+  useEffect(() => {
+    if (!hasSeenTutorial) {
+      setShowHowToPlay(true);
+    }
+  }, [hasSeenTutorial]);
+
+  const handleCloseHowToPlay = () => {
+    setShowHowToPlay(false);
+    if (!hasSeenTutorial) {
+      markTutorialSeen();
+    }
+  };
 
   return (
     <div className="screen menu-screen">
@@ -42,7 +59,12 @@ export function MenuScreen({ onNavigate }: MenuScreenProps) {
         <button className="btn btn-secondary" onClick={() => onNavigate('profiles')}>
           {t.profiles}
         </button>
+        <button className="btn btn-secondary" onClick={() => setShowHowToPlay(true)}>
+          {t.howToPlay}
+        </button>
       </div>
+
+      {showHowToPlay && <HowToPlayModal onClose={handleCloseHowToPlay} />}
     </div>
   );
 }

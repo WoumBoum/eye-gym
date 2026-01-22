@@ -1012,3 +1012,120 @@ body.dark-mode .rotation-range-btn.active {
   color: var(--color-text-light);
   font-style: italic;
 }
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--spacing-md);
+}
+
+.modal-content {
+  background-color: var(--color-background);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .modal-content {
+  background-color: #2a2a2a;
+}
+
+/* How to Play Modal */
+.how-to-play-modal {
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.how-to-play-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.how-to-play-intro {
+  font-size: 0.95rem;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.5;
+}
+
+.how-to-play-rule {
+  font-size: 1rem;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.how-to-play-examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+@media (min-width: 500px) {
+  .how-to-play-examples {
+    flex-direction: row;
+    gap: var(--spacing-md);
+  }
+}
+
+.how-to-play-example {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.how-to-play-illustration {
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  background-color: white;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+body.dark-mode .how-to-play-illustration {
+  background-color: #1a1a1a;
+}
+
+.how-to-play-caption {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
+.how-to-play-tip {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(26, 95, 180, 0.1);
+  border-radius: var(--radius-md);
+  line-height: 1.4;
+}
+
+body.dark-mode .how-to-play-tip {
+  background-color: rgba(74, 158, 255, 0.1);
+}
+
+.how-to-play-button {
+  width: 100%;
+  max-width: 200px;
+}

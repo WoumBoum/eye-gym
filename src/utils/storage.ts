@@ -52,6 +52,7 @@ export function createProfile(name: string): Profile {
     gradients: createDefaultGradients(),
     history: [],
     exploration: createDefaultExploration(),
+    hasSeenTutorial: false,
   };
 }
 
@@ -61,10 +62,11 @@ export function loadProfiles(): Profile[] {
     const stored = localStorage.getItem(PROFILES_KEY);
     if (stored) {
       const profiles = JSON.parse(stored);
-      // Ensure all profiles have exploration state (migration)
+      // Ensure all profiles have required fields (migration)
       return profiles.map((p: Profile) => ({
         ...p,
         exploration: p.exploration || createDefaultExploration(),
+        hasSeenTutorial: p.hasSeenTutorial ?? false,
       }));
     }
   } catch (e) {
@@ -176,6 +178,9 @@ export function importProfileFromJSON(jsonString: string): Profile | null {
     if (!profile.gradients) {
       profile.gradients = createDefaultGradients();
     }
+
+    // Ensure hasSeenTutorial exists
+    profile.hasSeenTutorial = profile.hasSeenTutorial ?? false;
 
     return profile;
   } catch (e) {

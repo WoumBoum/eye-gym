@@ -15,14 +15,14 @@ const COLORS_LIGHT = {
   background: '#f5f5f0',
 };
 
-// Colors for dark mode
+// Colors for dark mode (same point colors, different background/user point)
 const COLORS_DARK = {
   clearBlue: '#6eb5ff',
   clearRed: '#ff6e6e',
   clearGreen: '#6eff8e',
-  darkBlue: '#4a9eff',
-  darkRed: '#ff6b6b',
-  darkGreen: '#4ade80',
+  darkBlue: '#1a5fb4',
+  darkRed: '#c01c28',
+  darkGreen: '#26a269',
   userPoint: '#ffffff',
   background: '#1a1a1a',
 };
